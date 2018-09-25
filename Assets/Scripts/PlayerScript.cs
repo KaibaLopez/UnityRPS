@@ -11,7 +11,7 @@ public class PlayerScript : NetworkBehaviour {
     public Sprite[] sprites;
     public Transform[] spawn_P = new Transform[3];
     public GameObject[] buttonsPrefab;
-    [SyncVar] public int CurrentSel = 0;
+    public int CurrentSel = 0;
 
     
     //Just for clarification on meanings.

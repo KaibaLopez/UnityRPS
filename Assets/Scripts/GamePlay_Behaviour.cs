@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class GamePlay_Behaviour : MonoBehaviour {
+public class GamePlay_Behaviour : NetworkBehaviour {
 
     public delegate void ToggleActiveButtons();
     public delegate void StartGame();
@@ -15,35 +15,67 @@ public class GamePlay_Behaviour : MonoBehaviour {
 
     public static event StartGame TimerStarter;
 
+    [SyncVar(hook = "OnPlayerNameChanged")]
+    public int PlayerStatus;
 
- 
-    
-    // Use this for initialization
-    void Start() { 
+    void Start() {
+        if (!isLocalPlayer)
+            return;
     }
-	// Update is called once per frame
 	void Update () {
     }
-
-    
-
-    void EndGame()
+    /// <summary>
+    /// Cheap Way of doing the change, Command cannot be called from button behavior
+    /// </summary>
+    /// <param name="val"></param>
+    public void ChangingValue(int val)
     {
         
-        StopCoroutine("LoseTime");
-        if (DestroyButtons != null)
-            DestroyButtons();
-        
-        Debug.Log("game over reached!");
+        CmdChangePlayerSelection(val);
+    }
+
+    /// <summary>
+    /// Change Selection value through the server.
+    /// </summary>
+    /// <param name="curSel"></param>
+    [Command]
+    void CmdChangePlayerSelection(int curSel)
+    {
+        //Mid-point before we update the clients of any change that has happened, Server can review it and apply or rollback the change.
+        PlayerStatus = curSel;
+    }
+    /// <summary>
+    /// We change the value and inform ALL  the clients that it has been changed.
+    /// </summary>
+    /// <param name="curSel"></param>
+    void OnPlayerNameChanged(int curSel)
+    {
+        Debug.Log("Old select is going to be"+" New sel is: "+curSel);
+
+        // WARNING:  If you use a hook on a SyncVar, then our local value does NOT get automatically updated,
+        // so we explicitly do it here.
+        PlayerStatus = curSel;
+
+        //I need to make sure the player object knows what to print.
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject Go in players)
+            Go.GetComponentInParent<PlayerScript>().Selection(curSel);
+
+        gameObject.name = "Gameplay_Manager [" + curSel + "]";
 
     }
-    void LastChanceChange()
-    {
-        if (ActiveButtons != null)
-        {
-            ActiveButtons();
-        }
-    }
+
+    /// <summary>
+    /// RPCs are special functions that only get executed on the clients.
+    /// </summary>
+    //[ClientRpc]
+    //void RpcChangePlayerSel(int curSel)
+    //{
+    //    Debug.Log("asked to change the player selection on a particular player connection Object" + curSel);
+
+    //}
+    //Events that are triggered by buttons.
+
     void OnEnable()
     {
         Button_behaviour.OnClicked += GameStarter;
@@ -52,7 +84,6 @@ public class GamePlay_Behaviour : MonoBehaviour {
     }
     void GameStarter()
     {
-        //StartCoroutine("LoseTime");
         if (DeactiveButtons != null)
         {
             DeactiveButtons();
@@ -63,7 +94,22 @@ public class GamePlay_Behaviour : MonoBehaviour {
         }
 
     }
+    void EndGame()
+    {
+        StopCoroutine("LoseTime");
+        if (DestroyButtons != null)
+            DestroyButtons();
 
+        Debug.Log("game over reached!");
+
+    }
+    void LastChanceChange()
+    {
+        if (ActiveButtons != null)
+        {
+            ActiveButtons();
+        }
+    }
     void OnDisable()
     {
         Button_behaviour.OnClicked -= GameStarter;

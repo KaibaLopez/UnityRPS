@@ -18,10 +18,9 @@ public class Button_behaviour : MonoBehaviour {
 
     void OnMouseDown()
     {
-        //need to make sure we select Local player ONLY
-        GameObject[] players=GameObject.FindGameObjectsWithTag("Player");
-        foreach(GameObject Go in players)
-            Go.GetComponentInParent<PlayerScript>().Selection(Sel_Val);
+        GameObject[] controllers = GameObject.FindGameObjectsWithTag("GameController");
+        foreach (GameObject Go in controllers)
+            Go.GetComponentInParent<GamePlay_Behaviour>().ChangingValue(Sel_Val);
 
         if (OnClicked != null)
             OnClicked();

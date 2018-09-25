@@ -12,8 +12,8 @@ public class Spawn_Behaviour : NetworkBehaviour {
     public Transform[] spawn_P = new Transform[3];
     // Use this for initialization
     void Start () {
+
         if (!isLocalPlayer){
-            Debug.Log("We open this!");
             return;
         }
         canvasObject = Instantiate(canvasPrefab);
@@ -27,8 +27,6 @@ public class Spawn_Behaviour : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (!isLocalPlayer)
-            return;
         
     }
     [Command]
