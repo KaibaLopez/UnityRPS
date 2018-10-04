@@ -16,11 +16,12 @@ public class GamePlay_Behaviour : NetworkBehaviour {
     public static event StartGame TimerStarter;
 
     [SyncVar(hook = "OnPlayerNameChanged")]
-    public int PlayerStatus;
+    public int PlayerStatus = -1;
 
     void Start() {
         if (!isLocalPlayer)
             return;
+        Debug.Log("my address is: " + Network.player.ipAddress);
     }
 	void Update () {
     }
@@ -30,7 +31,10 @@ public class GamePlay_Behaviour : NetworkBehaviour {
     /// <param name="val"></param>
     public void ChangingValue(int val)
     {
-        
+        if (!isLocalPlayer)
+            return;
+
+        //RpcChangePlayerSel(val);
         CmdChangePlayerSelection(val);
     }
 
@@ -50,6 +54,7 @@ public class GamePlay_Behaviour : NetworkBehaviour {
     /// <param name="curSel"></param>
     void OnPlayerNameChanged(int curSel)
     {
+        
         Debug.Log("Old select is going to be"+" New sel is: "+curSel);
 
         // WARNING:  If you use a hook on a SyncVar, then our local value does NOT get automatically updated,
@@ -57,9 +62,10 @@ public class GamePlay_Behaviour : NetworkBehaviour {
         PlayerStatus = curSel;
 
         //I need to make sure the player object knows what to print.
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        foreach (GameObject Go in players)
-            Go.GetComponentInParent<PlayerScript>().Selection(curSel);
+        //But I need only MY (client) player.
+        //GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        //foreach (GameObject Go in players)
+        //    Go.GetComponent<PlayerScript>().SelectionChanged(curSel);
 
         gameObject.name = "Gameplay_Manager [" + curSel + "]";
 
@@ -68,12 +74,13 @@ public class GamePlay_Behaviour : NetworkBehaviour {
     /// <summary>
     /// RPCs are special functions that only get executed on the clients.
     /// </summary>
-    //[ClientRpc]
-    //void RpcChangePlayerSel(int curSel)
-    //{
-    //    Debug.Log("asked to change the player selection on a particular player connection Object" + curSel);
+    [ClientRpc]
+    void RpcChangePlayerSel(int curSel)
+    {
+        //Debug.Log("asked to change the player selection on a particular player connection Object" + curSel);
 
-    //}
+    }
+
     //Events that are triggered by buttons.
 
     void OnEnable()

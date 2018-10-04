@@ -18,13 +18,13 @@ public class Button_behaviour : MonoBehaviour {
 
     void OnMouseDown()
     {
-        GameObject[] controllers = GameObject.FindGameObjectsWithTag("GameController");
-        foreach (GameObject Go in controllers)
-            Go.GetComponentInParent<GamePlay_Behaviour>().ChangingValue(Sel_Val);
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject Go in players)
+            Go.GetComponent<Player_Network_Behaviour>().SelectionChanged(Sel_Val);
 
         if (OnClicked != null)
             OnClicked();
-        Debug.Log("I was clicked! ");
+
     }
 
     

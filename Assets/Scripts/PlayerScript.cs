@@ -3,32 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class PlayerScript : NetworkBehaviour {
+public class PlayerScript : MonoBehaviour {
 
     private SpriteRenderer spriteR;
     
 
     public Sprite[] sprites;
-    public Transform[] spawn_P = new Transform[3];
     public GameObject[] buttonsPrefab;
-    public int CurrentSel = 0;
-
-    
+       
     //Just for clarification on meanings.
     enum Choice { Rock = 0, Paper = 1, Scissors = 2 }
     private float sqrRadius;
 
     void Start()
     {      
-        spriteR = gameObject.GetComponent<SpriteRenderer>();
-       
-        //for (int i = 0; i < 3; i++)
-        //{
-        //   GameObject Go = Instantiate(buttonsPrefab[i], spawn_P[i].position, Quaternion.identity);
-        //   Go.GetComponent<Button_behaviour>().setSel_val(i);
-        //}
 
+        spriteR = gameObject.GetComponent<SpriteRenderer>();
     }
+
+
+    
 
     /// <summary>
     /// public method for the buttons to call
@@ -36,24 +30,16 @@ public class PlayerScript : NetworkBehaviour {
     /// <param name="sel"></param>
     public void Selection( int sel)
     {
-
-        if (hasAuthority == false)
-        {
-            Debug.Log("We don't have control!");
-            return;
-        }
+          
         if (sel == (int)Choice.Rock){
             Change(sprites[0]);
-            CurrentSel = 0;
         }else if (sel == (int)Choice.Paper)
         {
             Change(sprites[1]);
-            CurrentSel = 1;
         }
         else
         {
             Change(sprites[2]);
-            CurrentSel = 2;
         }
     }
 
@@ -69,8 +55,8 @@ public class PlayerScript : NetworkBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
-        
+    void Update()
+    {
     }
 
 
