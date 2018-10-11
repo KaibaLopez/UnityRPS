@@ -21,7 +21,6 @@ public class GamePlay_Behaviour : NetworkBehaviour {
     void Start() {
         if (!isLocalPlayer)
             return;
-        Debug.Log("my address is: " + Network.player.ipAddress);
     }
 	void Update () {
     }
